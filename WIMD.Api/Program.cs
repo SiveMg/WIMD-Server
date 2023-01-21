@@ -1,12 +1,50 @@
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using WIMD.Infrastructure.Database;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+IConfiguration configuration = new ConfigurationBuilder()
+    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+    .AddJsonFile("appsettings.json")
+    .Build();
 
+string connectionString = configuration.GetConnectionString("DefaultConnection");
+var assembly = AppDomain.CurrentDomain.Load("WIMD.Domain");
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddDbContext<WIMDContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddSwaggerGen();
+builder.Services.AddMediatR(assembly);
 
+builder.Services.AddSwaggerGen(option =>
+{
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Books API", Version = "v1" });
+    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

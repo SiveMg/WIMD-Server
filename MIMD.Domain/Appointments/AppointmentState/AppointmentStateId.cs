@@ -7,7 +7,6 @@ namespace WIMD.Domain.Appointments
         public AppointmentStateId(Guid value)
             : base(value)
         {
-
         }
     }
 }
