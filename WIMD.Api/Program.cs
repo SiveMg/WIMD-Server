@@ -1,7 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.OpenApi.Models;
 using WIMD.Infrastructure.Database;
+using WIMD.Infrastructure.SeedWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +16,9 @@ string connectionString = configuration.GetConnectionString("DefaultConnection")
 var assembly = AppDomain.CurrentDomain.Load("WIMD.Domain");
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddDbContext<WIMDContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<WIMDContext>(options => options
+                                            .ReplaceService<IValueConverterSelector, StronglyTypedIdValueConverterSelector>()
+                                            .UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(assembly);
 
