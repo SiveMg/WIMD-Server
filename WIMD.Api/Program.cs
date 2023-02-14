@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.OpenApi.Models;
+using WIMD.Api.Configuration;
 using WIMD.Infrastructure.Database;
 using WIMD.Infrastructure.SeedWork;
 
@@ -56,8 +57,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
+app.UseMiddleware<CorrelationMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
