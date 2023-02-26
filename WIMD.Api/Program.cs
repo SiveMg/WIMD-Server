@@ -13,10 +13,10 @@ IConfiguration configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
 
-string connectionString = configuration.GetConnectionString("DefaultConnection");
 var assembly = AppDomain.CurrentDomain.Load("WIMD.Domain");
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("AuthDbConnection")));
 builder.Services.AddDbContext<WIMDContext>(options => options
                                             .ReplaceService<IValueConverterSelector, StronglyTypedIdValueConverterSelector>()
                                             .UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
